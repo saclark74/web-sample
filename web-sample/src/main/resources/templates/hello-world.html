@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html  xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+<title>Web Sample</title>
+</head>
+<body>
+<h1 th:text="|Text: ${HelloWorldString}|">hello world hard-coded</h1>
+<h2 th:text="|Active Profiles: ${ActiveProfiles}|">active profiles</h2>
+<div th:if="${User != null}">
+  <h2 th:text="|Current User: ${User.getEmail()}|">current user</h2>
+  <h2 th:text="|Role: ${User.getRole()}|">role</h2>
+</div>
+<div th:if="${Name != null}">
+  <h2 th:text="|Name: ${Name}|">role</h2>
+</div>
+
+<h3 th:text="|Greeting Via Conv: ${SampleDataGreetingConvention}|">greeting</h3>
+<h3 th:text="|Greeting Via Impl: ${SampleDataGreetingImpl}|">greeting</h3>
+<h3 th:text="|Greeting Via Attr: ${SampleDataGreetingAttr}|">greeting</h3>
+<h3 th:text="|Greeting Via  DSL: ${SampleDataGreetingDSL}|">greeting</h3>
+<h3 th:text="|Greeting Via Client-DSL: ${SampleDataGreetingClientDSL}|">greeting</h3>
+</body>
+</html>

@@ -1,0 +1,96 @@
+buildscript {
+    ext {
+        springBootVersion = '1.2.4.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}") 
+        classpath("io.spring.gradle:dependency-management-plugin:0.5.1.RELEASE")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'spring-boot' 
+apply plugin: 'io.spring.dependency-management'
+
+
+jar {
+    baseName = 'web-sample'
+    version = '0.0.1-SNAPSHOT'
+}
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+
+dependencies {
+    compile("org.springframework.boot:spring-boot-starter-web")
+    compile("org.springframework.boot:spring-boot-starter-thymeleaf")
+    compile("org.springframework.boot:spring-boot-starter-actuator")
+    compile("org.springframework.boot:spring-boot-starter-data-jpa")
+    compile("org.springframework.boot:spring-boot-starter-security")
+
+
+    // Janino - needed for conditional logback configuration in the xml
+    compile("org.codehaus.janino:janino:2.7.8")
+
+    // query DSL
+    compile("com.mysema.querydsl:querydsl-apt:3.6.4")
+    compile("com.mysema.querydsl:querydsl-jpa:3.6.4")
+
+    // mysql database driver
+    runtime "mysql:mysql-connector-java:5.1.34"
+
+    // h2 database driver (in-memory database)
+    runtime("com.h2database:h2:1.3.176")
+
+    testCompile("org.springframework.boot:spring-boot-starter-test")
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.3'
+}
+
+
+eclipse {
+    classpath {
+         containers.remove('org.eclipse.jdt.launching.JRE_CONTAINER')
+         containers 'org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8'
+    }
+}
+
+idea {
+    // this tells intellij that this is a Source Folder
+    // we are putting auto-generated QueryDSL files in there
+    module {
+        generatedSourceDirs  += file('src/main/generated')
+        sourceDirs += file('src/main/generated')
+    }
+}
+
+
+
+// This builds the Query DSL Q*.java classes
+def generatedSrcDir = 'src/main/generated'
+task createGeneratedSrcDir << {
+    file(generatedSrcDir).mkdirs()
+}
+compileJava.dependsOn createGeneratedSrcDir
+compileJava {
+        options.compilerArgs = [
+                '-processor', 'com.mysema.query.apt.jpa.JPAAnnotationProcessor',
+                '-s', file(generatedSrcDir).absolutePath
+        ]
+}
+clean {
+    delete generatedSrcDir
+}
+
+
